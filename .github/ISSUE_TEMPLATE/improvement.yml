@@ -1,0 +1,44 @@
+name: Improvement Request
+description: Suggest a new feature or enhancement to Kiri
+labels: ["enhancement", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the improvement you'd like to see.
+        Check [existing issues](../issues) and [discussions](../discussions) first to avoid duplicates.
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Use case
+      description: What problem are you trying to solve? Who is affected and how often?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed solution
+      description: How would you like this to work? Be as specific as possible.
+    validations:
+      required: true
+  - type: input
+    id: requirements
+    attributes:
+      label: Related requirements (if any)
+      description: Link to existing requirements or user stories (e.g. REQ-F-012, US-07).
+      placeholder: "REQ-F-NNN or US-XX"
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any other approaches you thought about?
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority from your perspective
+      options:
+        - Nice to have
+        - Important for my use case
+        - Blocking — I cannot use Kiri without this
+    validations:
+      required: true

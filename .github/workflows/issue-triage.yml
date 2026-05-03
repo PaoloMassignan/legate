@@ -1,0 +1,55 @@
+name: Issue Triage Agent
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  triage:
+    name: Claude issue triage
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]' && github.actor != 'github-actions[bot]'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install anthropic
+        run: pip install anthropic
+
+      - name: Ensure labels exist
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          declare -A label_colors=(
+            ["bug"]="d73a4a"
+            ["enhancement"]="a2eeef"
+            ["question"]="d876e3"
+            ["security"]="e4e669"
+            ["triage"]="ededed"
+            ["priority:high"]="b60205"
+            ["priority:medium"]="fbca04"
+            ["priority:low"]="0e8a16"
+            ["needs-info"]="fef2c0"
+          )
+          for label in "${!label_colors[@]}"; do
+            gh label create "$label" --color "${label_colors[$label]}" --force 2>/dev/null || true
+          done
+
+      - name: Run issue triage agent
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_LABELS: ${{ join(github.event.issue.labels.*.name, ',') }}
+        run: python .github/scripts/issue_triage.py
